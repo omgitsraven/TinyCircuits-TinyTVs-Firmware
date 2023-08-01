@@ -20,7 +20,7 @@
 // If this is ever incremented, every platform's binary needs to be recomplied to ensure the latest version below is reported
 // even if the change did not affect every platform.
 #define MAJOR 1
-#define MINOR 1
+#define MINOR 2
 #define PATCH 0
 
 // *** These comments are used by the update page, update them when the above MAJOR, MINOR, or PATCH numbers change ***
@@ -36,11 +36,11 @@
 //             the latest firmware file from GitHub and upload it. Even if the required version below doesn't change for a platform, a new firmware binary
 //             needs to compiled so as to report the latest MAJOR, MINOR, and PATCH version
 // TINYTV_2_VERSION_REQUIRED_MAJOR 1
-// TINYTV_2_VERSION_REQUIRED_MINOR 1
+// TINYTV_2_VERSION_REQUIRED_MINOR 2
 // TINYTV_2_VERSION_REQUIRED_PATCH 0
 
 // TINYTV_MINI_VERSION_REQUIRED_MAJOR 1
-// TINYTV_MINI_VERSION_REQUIRED_MINOR 1
+// TINYTV_MINI_VERSION_REQUIRED_MINOR 2
 // TINYTV_MINI_VERSION_REQUIRED_PATCH 0
 
 // TINYTV_DIY_VERSION_REQUIRED_MAJOR 1

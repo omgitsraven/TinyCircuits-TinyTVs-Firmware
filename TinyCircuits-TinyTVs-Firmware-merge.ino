@@ -239,8 +239,8 @@ void loop() {
 
 #ifndef TinyTVKit
   if (TVscreenOffMode) {
-    // Turn TV off after 2 minutes in screen off mode
-    if (millis() - TVscreenOffModeStartTime > 1000 * 60 * 2) {
+    // Turn TV off after specified duration in screen off mode
+    if (millis() - TVscreenOffModeStartTime > 1000 * powerTimeoutSecs) {
       hardwarePowerOff();
     }
     return;
