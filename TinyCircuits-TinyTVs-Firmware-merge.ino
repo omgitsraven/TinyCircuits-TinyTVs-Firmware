@@ -220,6 +220,7 @@ void loop() {
     } else {
       //set off timer
       powerDownTimer = millis();
+      settingsNeedSaved = 1;//save immediately
     }
   }
 
