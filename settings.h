@@ -18,11 +18,40 @@ bool liveMode = true;
 bool doStaticEffects = true;
 bool showChannelNumber = true;
 bool showVolumeBar = true;
+<<<<<<< Updated upstream
+=======
+int powerTimeoutSecs = 2 * 60;
+long startTimeSecs = 0;
+bool allowResume = false;
+bool shuffleResume = false;
+
+>>>>>>> Stashed changes
 
 //#define cdc SerialUSB
 bool timeStamp = false;
 
+<<<<<<< Updated upstream
 const char keyNames[][15] = {"tvType", "fwVersion", "channel", "volume", "alphabetize", "loopVideo", "liveVideo", "static", "showChannel", "showVolume"}; //showTime?
+=======
+const char keyNames[][15] = {
+  "tvType",
+  "fwVersion",
+  "channel",
+  "volume",
+  "alphabetize",
+  "loopVideo",
+  "liveVideo",
+  "static",
+  "showChannel",
+  "showVolume",
+#ifndef TinyTVKit
+  "powerOffSecs",
+#endif
+  "startTimeSecs",
+  "allowResume",
+  "shuffleResume",
+}; //showTime?
+>>>>>>> Stashed changes
 
 String getKeyValue(String key) {
   if (key == String("tvType")) return String(TYPE_STRING);
@@ -39,6 +68,13 @@ String getKeyValue(String key) {
   if (key == String("static")) return String(doStaticEffects ? "true" : "false");
   if (key == String("showChannel")) return String(showChannelNumber ? "true" : "false");
   if (key == String("showVolume")) return String(showVolumeBar ? "true" : "false");
+<<<<<<< Updated upstream
+=======
+  if (key == String("powerOffSecs")) return String(powerTimeoutSecs);
+  if (key == String("startTimeSecs")) return String(startTimeSecs);
+  if (key == String("allowResume")) return String(allowResume ? "true" : "false");
+  if (key == String("shuffleResume")) return String(shuffleResume ? "true" : "false");
+>>>>>>> Stashed changes
   return "none";
 }
 
@@ -74,6 +110,13 @@ bool setValueByKey(String key, String val) {
   else if (key == String("static")) doStaticEffects = (val == (String)"true") ? true : false;
   else if (key == String("showChannel")) showChannelNumber = (val == (String)"true") ? true : false;
   else if (key == String("showVolume")) showVolumeBar = (val == (String)"true") ? true : false;
+<<<<<<< Updated upstream
+=======
+  else if (key == String("powerOffSecs")) powerTimeoutSecs = max(2,val.toInt());
+  else if (key == String("startTimeSecs")) startTimeSecs = val.toInt();
+  else if (key == String("allowResume")) allowResume = (val == (String)"true") ? true : false;
+  else if (key == String("shuffleResume")) shuffleResume = (val == (String)"true") ? true : false;
+>>>>>>> Stashed changes
   else return false;
   return true;
 }

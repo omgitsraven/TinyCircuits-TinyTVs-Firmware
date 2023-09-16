@@ -62,6 +62,16 @@ Adafruit_USBD_CDC cdc;
 #endif
 #include "USB_CDC.h"
 
+<<<<<<< Updated upstream:TinyCircuits-TinyTVs-Firmware.ino
+=======
+
+// Select ONE from this list!
+#include "TinyTV2.h"
+//#include "TinyTVMini.h"
+//#include "TinyTVKit.h"
+
+
+>>>>>>> Stashed changes:TinyCircuits-TinyTVs-Firmware-merge.ino
 #include "videoBuffer.h"
 #include "settings.h"
 #include "TinyIRReceiver.hpp"       // Unmodified IR library- requires IR_INPUT_PIN defined in hardware header
@@ -77,10 +87,13 @@ bool skipNextFrame = false;
 unsigned long totalTime = 0;
 uint64_t powerDownTimer = 0;
 bool TVscreenOffMode = false;
-uint32_t settingsNeedSaved = 0;
+uint64_t settingsNeedSaved = 0;
+int timeUntilSave = 2000;
 uint64_t framerateHelper = 0;
 bool live = false;
 int staticTimeMS = 300;
+int debounceTimeMS = 20;
+uint64_t debounceStartTime = 0;
 
 void setup() {
 #ifdef has_USB_MSC
@@ -132,6 +145,16 @@ void initVideoPlayback() {
     }
   }
   loadSettings();
+  if (allowResume) {
+    if (shuffleResume) {
+      randomSeed(startTimeSecs);
+      setMillisOffset(random(1000000)*1000);
+    } else {
+      setMillisOffset(startTimeSecs*1000);
+    }
+  } else {
+    setMillisOffset(0);
+  }
   setVolume(volumeSetting);
   if (loadVideoList()) {
     showNoVideoError = false;
@@ -193,7 +216,7 @@ void loop() {
   }
   if (inputFlags.settingsChanged) {
     inputFlags.settingsChanged = false;
-    settingsNeedSaved = millis();
+    settingsNeedSaved = millis()+timeUntilSave;
   }
 
 
@@ -220,6 +243,17 @@ void loop() {
     } else {
       //set off timer
       powerDownTimer = millis();
+      if (allowResume) {
+        if (shuffleResume) {
+          startTimeSecs = millis();
+        } else {
+          startTimeSecs = (millis()+getMillisOffset())/1000;
+        }
+      } else {
+        startTimeSecs = 0;
+      }
+      
+      settingsNeedSaved = millis() + 1000;
     }
   }
 
@@ -237,6 +271,19 @@ void loop() {
     displayOff();
   }
 
+<<<<<<< Updated upstream:TinyCircuits-TinyTVs-Firmware.ino
+=======
+  if (settingsNeedSaved) {
+    if (millis() > settingsNeedSaved) {
+      dbgPrint("Saving settings file");
+      saveSettings();
+      settingsNeedSaved = 0;
+      dbgPrint("Saved settings file");
+    }
+  }
+
+#ifndef TinyTVKit
+>>>>>>> Stashed changes:TinyCircuits-TinyTVs-Firmware-merge.ino
   if (TVscreenOffMode) {
 #ifndef TinyTVKit
     // Turn TV off after 2 minutes in screen off mode
@@ -256,43 +303,49 @@ void loop() {
 
   if (inputFlags.channelUp) {
     inputFlags.channelUp = false;
-    if (!TVscreenOffMode && !live) {
-      settingsNeedSaved = millis();
-      if (doStaticEffects) {
-        drawStaticFor(staticTimeMS);
-        playStaticFor(staticTimeMS);
+    if ( millis() - debounceStartTime > debounceTimeMS) {
+      if (!TVscreenOffMode && !live) {
+        settingsNeedSaved = millis()+timeUntilSave;
+        if (doStaticEffects) {
+          drawStaticFor(staticTimeMS);
+          playStaticFor(staticTimeMS);
+        }
+        if (nextVideo()) {
+          nextVideoError = millis();
+        } else {
+          nextVideoError = 0;
+          setAudioSampleRate(getVideoAudioRate());
+          drawChannelNumberFor(1000);
+        }
       }
-      if (nextVideo()) {
-        nextVideoError = millis();
-      } else {
-        nextVideoError = 0;
-        setAudioSampleRate(getVideoAudioRate());
-        drawChannelNumberFor(1000);
-      }
+      debounceStartTime = millis();
     }
   }
 
   if (inputFlags.channelDown) {
     inputFlags.channelDown = false;
-    if (!TVscreenOffMode && !live) {
-      settingsNeedSaved = millis();
-      if (doStaticEffects) {
-        drawStaticFor(staticTimeMS);
-        playStaticFor(staticTimeMS);
+    if ( millis() - debounceStartTime > debounceTimeMS) {
+      if (!TVscreenOffMode && !live) {
+        settingsNeedSaved = millis()+timeUntilSave;
+        if (doStaticEffects) {
+          drawStaticFor(staticTimeMS);
+          playStaticFor(staticTimeMS);
+        }
+        if (prevVideo()) {
+          prevVideoError = millis();
+        } else {
+          prevVideoError = 0;
+          setAudioSampleRate(getVideoAudioRate());
+          drawChannelNumberFor(1000);
+        }
       }
-      if (prevVideo()) {
-        prevVideoError = millis();
-      } else {
-        prevVideoError = 0;
-        setAudioSampleRate(getVideoAudioRate());
-        drawChannelNumberFor(1000);
-      }
+      debounceStartTime = millis();
     }
   }
   if (inputFlags.channelSet) {
     inputFlags.channelSet = false;
     if (!TVscreenOffMode && !live) {
-      settingsNeedSaved = millis();
+      settingsNeedSaved = millis()+timeUntilSave;
       if (doStaticEffects) {
         drawStaticFor(staticTimeMS);
         playStaticFor(staticTimeMS);
@@ -310,7 +363,7 @@ void loop() {
   if (inputFlags.volUp) {
     inputFlags.volUp = false;
     if (!TVscreenOffMode && !live) {
-      settingsNeedSaved = millis();
+      settingsNeedSaved = millis()+timeUntilSave;
       dbgPrint("vol up");
       volumeUp();
       drawVolumeFor(1000);
@@ -319,7 +372,7 @@ void loop() {
   if (inputFlags.volDown) {
     inputFlags.volDown = false;
     if (!TVscreenOffMode && !live) {
-      settingsNeedSaved = millis();
+      settingsNeedSaved = millis()+timeUntilSave;
       dbgPrint("vol down");
       volumeDown();
       drawVolumeFor(1000);
@@ -329,7 +382,7 @@ void loop() {
     inputFlags.volumeSet = false;
     if (!TVscreenOffMode && !live) {
       setVolume(volumeSetting);
-      settingsNeedSaved = millis();
+      settingsNeedSaved = millis()+timeUntilSave;
       drawVolumeFor(1000);
     }
   }
@@ -471,14 +524,7 @@ void loop() {
   }
 
 
-  if (settingsNeedSaved) {
-    if (millis() - settingsNeedSaved > 2000) {
-      dbgPrint("Saving settings file");
-      saveSettings();
-      settingsNeedSaved = 0;
-      dbgPrint("Saved settings file");
-    }
-  }
+  
 
 
 }
